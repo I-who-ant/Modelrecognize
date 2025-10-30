@@ -72,6 +72,9 @@ VideoLearningNote/
 - [随机初始化](01_神经网络基础/10.随机初始化.md) - 2025-01-26 🔴必学
 
 #### 02_优化与训练
+
+**⭐ 模块总结**: [优化与训练完整学习路径](02_优化与训练/28_模块总结_优化与训练完整路径.md) - 2025-10-30 🎯🎯🎯 **必读!**
+
 - [训练集-验证集-测试集](02_优化与训练/0_训练集-验证集-测试集.md) - 2025-01-28 🔴必学
 - [偏差与方差](02_优化与训练/1_偏差与方差.md) - 2025-01-28 🔴必学
 - [机器学习基础流程](02_优化与训练/2_机器学习基础流程.md) - 2025-01-28 🔴必学
@@ -94,6 +97,33 @@ VideoLearningNote/
 - [动量梯度下降](02_优化与训练/19_动量梯度下降.md) - 2025-10-29 🔴必学
 - [RMSprop优化器](02_优化与训练/20_RMSprop.md) - 2025-10-29 🔴必学
 - [Adam优化器](02_优化与训练/21_Adam优化器.md) - 2025-10-29 🔴必学 ⭐⭐⭐
+- [批量归一化](02_优化与训练/27_批量归一化.md) - 2025-10-30 🔴必学 ⭐⭐⭐
+- [Softmax回归与深度学习框架](02_优化与训练/29_Softmax回归与深度学习框架.md) - 2025-10-30 🔴必学 ⭐⭐⭐
+
+#### 03_序列模型
+
+**⭐ 模块学习路线图**: [序列模型学习路线图](03_序列模型/00_学习路线图.md) - 2025-10-30 🎯🎯🎯 **必读!**
+
+**模块目标**: 理解序列建模，掌握词嵌入，为 Transformer 做准备
+**核心重点**: 词嵌入 ⭐⭐⭐ + Attention 机制 ⭐⭐⭐⭐⭐
+**预计学习时间**: 2-3 周（优化路径）
+
+- [序列模型的意义](03_序列模型/0_序列模型意义.md) - 2025-10-30 🔴必学 ⭐⭐⭐
+- [符号表示](03_序列模型/1_符号表示.md) - 2025-10-30 🔴必学 ⭐⭐⭐
+
+*(更多笔记将在学习过程中添加)*
+
+#### 04_Attention与Transformer
+
+**⭐ 模块学习路线图**: [Attention与Transformer学习路线图](04_Attention与Transformer/00_学习路线图.md) - 2025-10-30 🎯🎯🎯🎯🎯 **最重要!必读!**
+
+**模块地位**: ⭐⭐⭐⭐⭐ **整个学习旅程中最核心的模块！**
+**模块目标**: 深入理解 Transformer 架构，直接理解 DeepSeek-V3 的核心机制
+**核心重点**: Self-Attention ⭐⭐⭐⭐⭐ + Multi-Head Attention ⭐⭐⭐⭐⭐ + Transformer 架构 ⭐⭐⭐⭐⭐
+**预计学习时间**: 3-4 周（深度学习）
+**与 DeepSeek-V3**: **直接相关！DeepSeek-V3 就是基于 Transformer 的大型语言模型**
+
+*(笔记将在学习过程中添加)*
 
 #### 05_其他概念
 - [受限玻尔兹曼机 (RBM)](./05_其他概念/受限玻尔兹曼机.md) - 2025-01-24 🟢可选
@@ -122,16 +152,18 @@ VideoLearningNote/
 - 正则化 (Dropout, L2等)
 - Batch Normalization
 
-**03_序列模型/**:
-- RNN, LSTM, GRU
-- 词嵌入 (Word Embedding)
+**03_序列模型/** (为 Transformer 做准备):
+- RNN, LSTM, GRU (了解局限)
+- 词嵌入 (Word Embedding) ⭐⭐⭐ 核心！
 - 序列生成
+- Attention 机制 ⭐⭐⭐⭐⭐
 
-**04_Attention与Transformer/** ⭐⭐⭐ (最重要):
-- Self-Attention机制
-- Multi-Head Attention
-- Transformer架构
-- Position Encoding
+**04_Attention与Transformer/** ⭐⭐⭐⭐⭐ (最重要!):
+- Self-Attention 机制 ⭐⭐⭐⭐⭐
+- Multi-Head Attention ⭐⭐⭐⭐⭐
+- Transformer 完整架构 ⭐⭐⭐⭐⭐
+- Position Encoding (RoPE) ⭐⭐⭐
+- Multi-Head Latent Attention (MLA) ⭐⭐⭐⭐⭐
 
 **05_其他概念/**:
 - 受限玻尔兹曼机 (RBM)
@@ -171,18 +203,26 @@ VideoLearningNote/
 - [x] 动量梯度下降 - 2025-10-29
 - [x] RMSprop优化器 - 2025-10-29
 - [x] Adam优化器 - 2025-10-29 ⭐⭐⭐
+- [x] 批量归一化 - 2025-10-30 ⭐⭐⭐
+- [x] Softmax回归与深度学习框架 - 2025-10-30 ⭐⭐⭐
 - [ ] 学习率调度
 
-#### Attention与Transformer ⭐⭐⭐
-- [ ] Self-Attention机制
-- [ ] Multi-Head Attention
-- [ ] Transformer架构
-- [ ] Position Encoding (RoPE)
+#### 序列模型（准备阶段）
+- [x] 序列模型意义 - 2025-10-30 ⭐⭐⭐
+- [x] 符号表示 - 2025-10-30 ⭐⭐⭐
+- [ ] RNN 基础
+- [ ] RNN 梯度消失（理解局限）
+- [ ] LSTM/GRU（快速了解）
+- [ ] 词嵌入 ⭐⭐⭐ 核心
+- [ ] Attention 机制原理 ⭐⭐⭐⭐⭐
 
-#### 序列模型
-- [ ] 词嵌入
-- [ ] RNN基础
-- [ ] LSTM
+#### Attention与Transformer ⭐⭐⭐⭐⭐ (最核心!)
+- [ ] Transformer 网络原理 ⭐⭐⭐⭐⭐
+- [ ] Self-Attention 机制 ⭐⭐⭐⭐⭐
+- [ ] Multi-Head Attention ⭐⭐⭐⭐⭐
+- [ ] Transformer 完整架构 ⭐⭐⭐⭐⭐
+- [ ] Position Encoding (RoPE) ⭐⭐⭐
+- [ ] Multi-Head Latent Attention (MLA) ⭐⭐⭐⭐⭐
 
 #### 其他
 - [x] 受限玻尔兹曼机 (RBM) - 2025-01-24
@@ -190,11 +230,14 @@ VideoLearningNote/
 
 ## 📊 学习统计
 
-- **已学习概念**: 33个
-- **待学习核心概念**: 约5个 (学习率调度、Attention机制等)
-- **当前阶段**: 优化与训练 95%完成 → 即将进入Attention与Transformer ⭐⭐⭐
-- **神经网络基础完成度**: 10/10 (100%) 🎉
-- **优化与训练完成度**: 21/22 (95%) 🎯🎯🎯
+- **已学习概念**: 38个 (含1个模块总结)
+- **已创建学习路线图**: 3个（优化与训练、序列模型、Attention与Transformer）
+- **待学习核心概念**: 序列模型（约10-15个）+ Attention与Transformer（约8-12个）
+- **当前阶段**: 序列模型学习中 ⭐⭐⭐ (Phase 1: 序列建模基础)
+- **神经网络基础完成度**: 14/14 (100%) 🎉
+- **优化与训练完成度**: 34/35 (97%) 🎯🎯🎯
+- **序列模型完成度**: 2/15 (13%) 🚀 基础阶段
+- **Attention与Transformer完成度**: 0% (已创建学习路线图 ✅)
 
 ## 🔗 相关资源
 
@@ -204,6 +247,12 @@ VideoLearningNote/
 
 ---
 
-**更新日期**: 2025-10-29
-**笔记数量**: 33个概念
+**更新日期**: 2025-10-30
+**笔记数量**: 38个概念 (含1个模块总结)
+**学习路线图**: 3个（优化与训练、序列模型、Attention与Transformer）✅
 **优化器学习完成**: 动量、RMSprop、Adam ✅
+**批量归一化**: 完整掌握 (含 b 抵消原理) ✅
+**深度学习框架**: PyTorch、TensorFlow ✅
+**重要总结**: 优化与训练完整学习路径 ⭐⭐⭐
+**序列模型进展**: Phase 1 基础阶段 - 已完成"序列模型意义"和"符号表示" ✅✅
+**下一步**: 学习循环神经网络（RNN）→ 最终目标: 理解 DeepSeek-V3 🎯
