@@ -108,7 +108,7 @@ Unigram 精度:
 ════════
 
 Clipped Precision:
-  p_n = Σ_{n-gram∈候选} Count_clip(n-gram) / Σ_{n-gram∈候选} Count(n-gram)
+  p_n = Σ_{n-gram∈候选} Count_clip(n-gram) / Σ_{n-gram∈候选} Count(n-gram)w
 
 其中:
   Count_clip(n-gram) = min(Count(n-gram), Max_Ref_Count(n-gram))
