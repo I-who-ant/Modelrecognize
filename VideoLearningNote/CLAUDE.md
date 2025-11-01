@@ -118,7 +118,7 @@ VideoLearningNote/
 
 #### 04_Attention与Transformer
 
-**⭐ 模块学习路线图**: [Attention与Transformer学习路线图](04_Attention与Transformer/00_学习路线图.md) - 2025-10-30 🎯🎯🎯🎯🎯 **最重要!必读!**
+**⭐ 模块学习路线图**: [Attention与Transformer学习路线图](04_Attention与Transformer/00_学习路线图.md) - 2025-11-01 🎯🎯🎯🎯🎯 **最重要!必读!**
 
 **模块地位**: ⭐⭐⭐⭐⭐ **整个学习旅程中最核心的模块！**
 **模块目标**: 深入理解 Transformer 架构，直接理解 DeepSeek-V3 的核心机制
@@ -126,11 +126,21 @@ VideoLearningNote/
 **预计学习时间**: 3-4 周（深度学习）
 **与 DeepSeek-V3**: **直接相关！DeepSeek-V3 就是基于 Transformer 的大型语言模型**
 
-*(笔记将在学习过程中添加)*
+**学习进度**:
+- [注意力机制原理](04_Attention与Transformer/1_注意力机制原理.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐
+- [理解注意力](04_Attention与Transformer/2_理解注意力.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐
+- [从输入到输出的完整过程](04_Attention与Transformer/2_2_从输入到输出的完整过程.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐
+- [2_3_对比Attention前后模型结构](04_Attention与Transformer/2_3_对比Attention前后模型结构.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐ 🆕
+- [3_注意力模型核心总结](04_Attention与Transformer/3_注意力模型核心总结.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐ 🆕
+- [4_Self-Attention自注意力机制](04_Attention与Transformer/4_Self-Attention自注意力机制.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐ 🆕
+- [5_Multi-Head Attention多头注意力](04_Attention与Transformer/5_Multi-Head Attention多头注意力.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐ 🆕
+- [6_Transformer网络原理](04_Attention与Transformer/6_Transformer网络原理.md) - 2025-11-01 🔴必学 ⭐⭐⭐⭐⭐ 🆕
+- [7_位置编码Position Encoding](04_Attention与Transformer/7_位置编码Position Encoding.md) - 2025-11-01 🔴必学 ⭐⭐⭐ 🆕
+- [应用案例: 语音识别与唤醒词检测](04_Attention与Transformer/4_1语音识别与唤醒词检测_注意力应用案例.md) - 2025-11-01 🔴必学 ⭐⭐⭐ 🆕
 
 #### 05_其他概念
-- [受限玻尔兹曼机 (RBM)](./05_其他概念/受限玻尔兹曼机.md) - 2025-01-24 🟢可选
-- [GANs (生成对抗网络)](./05_其他概念/GANs生成对抗网络.md) - 2025-01-26 🟡推荐
+- [受限玻尔兹曼机 (RBM)](05_其他概念/受限玻尔兹曼机.md) - 2025-01-24 🟢可选
+- [GANs (生成对抗网络)](05_其他概念/GANs生成对抗网络.md) - 2025-01-26 🟡推荐
 
 *(更多概念会在学习过程中添加)*
 
@@ -223,12 +233,17 @@ VideoLearningNote/
 - [ ] Attention 机制原理 ⭐⭐⭐⭐⭐
 
 #### Attention与Transformer ⭐⭐⭐⭐⭐ (最核心!)
-- [ ] Transformer 网络原理 ⭐⭐⭐⭐⭐
-- [ ] Self-Attention 机制 ⭐⭐⭐⭐⭐
-- [ ] Multi-Head Attention ⭐⭐⭐⭐⭐
-- [ ] Transformer 完整架构 ⭐⭐⭐⭐⭐
-- [ ] Position Encoding (RoPE) ⭐⭐⭐
-- [ ] Multi-Head Latent Attention (MLA) ⭐⭐⭐⭐⭐
+- [x] 注意力机制原理 - 2025-11-01 ⭐⭐⭐⭐⭐
+- [x] 理解注意力 (对齐分数与上下文向量) - 2025-11-01 ⭐⭐⭐⭐⭐
+- [x] 从输入到输出的完整过程 - 2025-11-01 ⭐⭐⭐⭐⭐
+- [x] 2_3_对比Attention前后模型结构 - 2025-11-01 ⭐⭐⭐⭐⭐ 🆕
+- [x] 3_注意力模型核心总结 - 2025-11-01 ⭐⭐⭐⭐⭐ 🆕
+- [x] 4_Self-Attention自注意力机制 - 2025-11-01 ⭐⭐⭐⭐⭐ 🆕
+- [x] 5_Multi-Head Attention多头注意力 - 2025-11-01 ⭐⭐⭐⭐⭐ 🆕
+- [x] 6_Transformer网络原理 - 2025-11-01 ⭐⭐⭐⭐⭐ 🆕
+- [x] 7_位置编码Position Encoding - 2025-11-01 ⭐⭐⭐ 🆕
+- [x] 应用案例: 语音识别与唤醒词检测 - 2025-11-01 ⭐⭐⭐ 🆕
+- [ ] Multi-Head Latent Attention (MLA) ⭐⭐⭐⭐⭐ (DeepSeek-V3核心！)
 
 #### 其他
 - [x] 受限玻尔兹曼机 (RBM) - 2025-01-24
@@ -236,25 +251,32 @@ VideoLearningNote/
 
 ## 📊 学习统计
 
-- **已学习概念**: 41个 (含1个模块总结)
+- **已学习概念**: 51个 (含1个模块总结 + 1个应用案例)
 - **已创建学习路线图**: 3个（优化与训练、序列模型、Attention与Transformer）
-- **待学习核心概念**: 序列模型（约7-9个）+ Attention与Transformer（约8-12个）
-- **当前阶段**: 序列模型学习中 ⭐⭐⭐ (Phase 1: RNN 完整掌握 - 架构+实现+训练)
+~~- **待学习核心概念**: 序列模型（约7-9个）+ Attention与Transformer（约7-11个）
+- **当前阶段**: Transformer架构深入学习中 ⭐⭐⭐⭐⭐ (位置编码完成！)
 - **神经网络基础完成度**: 14/14 (100%) 🎉
-- **优化与训练完成度**: 34/35 (97%) 🎯🎯🎯
+- **优化与训练完成度**: 35/36 (97%) 🎯🎯🎯 (新增语音识别与唤醒词检测应用案例)
 - **序列模型完成度**: 5/15 (33%) 🚀 RNN 训练机制完成
-- **Attention与Transformer完成度**: 0% (已创建学习路线图 ✅)
+- **Attention与Transformer完成度**: 9/15 (60%) 🚀 位置编码完成，向MLA迈进！ ✅✅✅✅✅✅~~
 
 ## 🔗 相关资源
 
-- [课程学习指南](../COURSE_LEARNING_GUIDE.md)
-- [DeepSeek-V3学习指南](../LEARNING_GUIDE.md)
-- [项目主README](../README.md)
+- [课程学习指南](../DeepSeek-V3-main/COURSE_LEARNING_GUIDE.md)
+- [DeepSeek-V3学习指南](../DeepSeek-V3-main/LEARNING_GUIDE.md)
+- [项目主README](../DeepSeek-V3-main/README.md)
 
 ---
 
-**更新日期**: 2025-10-31
-**笔记数量**: 41个概念 (含1个模块总结)
+**更新日期**: 2025-11-01
+**笔记数量**: 51个概念 (含1个模块总结 + 1个应用案例) + 7个新增笔记 🆕
+  - 2_3_对比Attention前后模型结构（注意力机制对比）
+  - 3_注意力模型核心总结（无注意力vs有注意力的本质区别）
+  - 4_Self-Attention自注意力机制（每个位置看向所有位置）
+  - 5_Multi-Head Attention多头注意力（并行多个视角学习）
+  - 6_Transformer网络原理（完整的编码器-解码器架构）
+  - 7_位置编码Position Encoding（正弦余弦、RoPE等四种方法详解）
+  - 语音识别与唤醒词检测总结（序列模型应用案例）
 **学习路线图**: 3个（优化与训练、序列模型、Attention与Transformer）✅
 **优化器学习完成**: 动量、RMSprop、Adam ✅
 **批量归一化**: 完整掌握 (含 b 抵消原理) ✅
@@ -266,4 +288,19 @@ VideoLearningNote/
   - ✅ RNN 模型（循环结构、前向传播、梯度消失）
   - ✅ RNN 实现细节（参数详解、矩阵拼接、多层堆叠、数据流动）
   - ✅ 时间反向传播（BPTT 算法、梯度推导、消失/爆炸问题、缓解方法）
-**下一步**: RNN 应用 → LSTM/GRU → 词嵌入 → Attention → 最终目标: 理解 DeepSeek-V3 🎯
+**应用案例**: 语音识别与唤醒词检测 ⭐⭐⭐ (新增！)
+  - ✅ 完整技术流程（预处理→特征→声学建模→解码）
+  - ✅ 传统方法vs深度学习方法对比
+  - ✅ 唤醒词检测的特殊性（常开型ASR、低功耗、极低误触发率）
+  - ✅ 序列模型在语音处理中的应用（RNN/LSTM/双向RNN/注意力）
+**Attention与Transformer进展**: Transformer核心架构扎实推进 ✅✅✅✅✅✅✅✅✅
+  - ✅ 注意力机制原理（Seq2Seq瓶颈、QKV概念）
+  - ✅ 理解注意力（对齐分数、注意力权重、上下文向量）
+  - ✅ 从输入到输出的完整过程（机器翻译实例）
+  - ✅ 2_3_对比Attention前后模型结构（新增！结构与计算步骤对比）
+  - ✅ 3_注意力模型核心总结（新增！有无注意力的本质区别）
+  - ✅ 4_Self-Attention自注意力机制（新增！每个位置看向所有位置）
+  - ✅ 5_Multi-Head Attention多头注意力（新增！并行多个视角学习）
+  - ✅ 6_Transformer网络原理（新增！完整的编码器-解码器架构）
+  - ✅ 7_位置编码Position Encoding（新增！正弦余弦、RoPE等四种方法详解）
+**下一步**: Multi-Head Latent Attention (MLA) → DeepSeek-V3架构解析 → 终极目标: 完全理解DeepSeek-V3！ 🎯

@@ -29,7 +29,7 @@ VideoLearningNote/
 
 - ✅ **神经网络基础** (14/14) - 已完成 100%
 - ✅ **优化与训练** (32/33) - 接近完成 96% 🎯
-  - ⭐ 已完成模块总结 ([查看完整学习路径](DeepSeek-V3-main/VideoLearningNote/02_优化与训练/28_模块总结_优化与训练完整路径.md))
+  - ⭐ 已完成模块总结 ([查看完整学习路径](02_优化与训练/28_模块总结_优化与训练完整路径.md))
 - 📝 **Attention机制** - 待学习 (下一步!)
 - 📝 **序列模型** - 待学习
 
@@ -48,8 +48,8 @@ cd DeepSeek-V3-main/VideoLearningNote/
 ```
 
 查看索引和学习路径：
-- [CLAUDE.md](DeepSeek-V3-main/VideoLearningNote/CLAUDE.md) - 完整笔记索引
-- [QA_快速查询.md](DeepSeek-V3-main/VideoLearningNote/QA_快速查询.md) - 常见问题速查
+- [CLAUDE.md](CLAUDE.md) - 完整笔记索引
+- [QA_快速查询.md](QA_快速查询.md) - 常见问题速查
 
 ## 🚀 最近更新
 
