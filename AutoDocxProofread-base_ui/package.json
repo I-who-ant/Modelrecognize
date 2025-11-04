@@ -1,0 +1,105 @@
+{
+  "name": "AutoDocxProofreading",
+  "productName": "AutoDocxProofreading",
+  "version": "1.1.1",
+  "description": "An intelligent long-document proofreading software powered by large language models. 基于大模型的简单的docx格式文档的校对",
+  "main": ".vite/build/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "release-major": "standard-version --release-as major",
+    "release-minor": "standard-version --release-as minor",
+    "release-patch": "standard-version --release-as patch",
+    "lint:fix": "eslint --ext .js,.ts,.vue . --fix",
+    "commit": "git add . && git-cz"
+  },
+  "eslintConfig": {
+    "extends": "./.eslintrc.js"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-wix": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron-forge/plugin-vite": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "electron": "30.0.2",
+    "eslint": "^8.0.1",
+    "eslint-plugin-import": "^2.25.0",
+    "eslint-plugin-vue": "^9.25.0",
+    "git-cz": "^4.9.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "standard-version": "^9.5.0",
+    "ts-node": "^10.0.0",
+    "typescript": "~4.5.4",
+    "vite": "^5.0.12"
+  },
+  "keywords": [],
+  "author": {
+    "name": "CZ600",
+    "url": "https://github.com/CZ600"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^1.17.0",
+    "@google/generative-ai": "^0.24.1",
+    "@lancedb/lancedb": "^0.22.1",
+    "@types/node": "^24.3.1",
+    "@vueuse/core": "^14.0.0",
+    "apache-arrow": "^18.1.0",
+    "axios": "^1.11.0",
+    "cli-progress": "^3.12.0",
+    "docx": "^9.5.1",
+    "docx-preview": "^0.3.6",
+    "docxtemplater": "^3.66.3",
+    "electron-squirrel-startup": "^1.0.0",
+    "element-plus": "^2.11.1",
+    "fast-xml-parser": "^5.2.5",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.11.0",
+    "marked": "^16.3.0",
+    "openai": "^5.19.1",
+    "ora": "^8.2.0",
+    "p-limit": "^7.1.1",
+    "pdf-parse": "^2.1.7",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
+    "pizzip": "^3.2.0",
+    "sqlite": "^5.1.1",
+    "sqlite-vec": "^0.1.7-alpha.2",
+    "sqlite3": "^5.1.7",
+    "util": "^0.12.5",
+    "uuid": "^13.0.0",
+    "vue": "^3.4.27",
+    "vue-demi": "^0.14.10",
+    "vue-markdown": "^2.2.4",
+    "vue-router": "^4.5.1"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "npm run lint:fix"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  }
+}

@@ -75,9 +75,9 @@ ART = Decompose(UseTools(IntegrateResults))
 class ToolSelector:
     """工具选择器"""
     def __init__(self, available_tools, llm):
-        self.available_tools = available_tools
-        self.llm = llm
-        self.selection_criteria = {
+        self.available_tools = available_tools # 可用工具列表
+        self.llm = llm # 大语言模型
+        self.selection_criteria = { # 工具选择标准
             'capability_match': self.assess_capability_match,
             'efficiency': self.assess_efficiency,
             'reliability': self.assess_reliability,
@@ -95,8 +95,9 @@ class ToolSelector:
         Returns:
             list: 选定的工具列表及参数
         """
-        # 1. 分析任务需求
-        required_capabilities = self.analyze_task_requirements(task_requirements)
+        # 1. 分析任务需求 :通过大语言模型分析任务需求，识别所需的工具能力
+        
+        required_capabilities = self.analyze_task_requirements(task_requirements) # 分析任务需求，识别所需的工具能力
 
         # 2. 评估工具匹配度
         tool_candidates = self.evaluate_tool_candidates(required_capabilities)
