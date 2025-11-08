@@ -238,7 +238,7 @@ class CodeExecutor:
                 "success": False,
                 "error": str(e)
             }
-
+     
 # 使用示例
 executor = CodeExecutor()
 execution_result = executor.execute(code)

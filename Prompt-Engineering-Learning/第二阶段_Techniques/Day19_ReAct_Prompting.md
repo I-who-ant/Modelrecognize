@@ -1,10 +1,12 @@
+
 # Day 17: ReAct（Reasoning and Acting）提示技术
 
 ## 理论学习
 
 ### ReAct的核心原理
 
-ReAct（Reasoning and Acting）是一种将推理（Reasoning）和行动（Acting）结合起来的提示技术框架。该技术由Google Research提出，通过让大语言模型在推理过程中显式地调用外部工具和采取行动，形成"思考-行动-观察"的循环机制，从而解决复杂的多步骤问题。
+ReAct（Reasoning and Acting）是一种将推理（Reasoning）和行动（Acting）结合起来的提示技术框架。
+该技术由Google Research提出，通过让大语言模型在推理过程中显式地调用外部工具和采取行动，形成"思考-行动-观察"的循环机制，从而解决复杂的多步骤问题。
 
 #### 技术机制与工作原理
 
