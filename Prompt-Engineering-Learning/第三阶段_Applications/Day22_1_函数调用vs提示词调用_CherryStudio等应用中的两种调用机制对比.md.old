@@ -1,0 +1,944 @@
+# Day22_1 - 函数调用 vs 提示词调用:CherryStudio等应用中的两种调用机制对比
+
+**学习日期**: 2025-11-08
+**阶段**: 第三阶段 - Applications (实际应用深度扩展)
+**重要程度**: ⭐⭐⭐⭐⭐ **关键概念区分!**
+
+---
+
+## 你的困惑
+
+你在使用CherryStudio等AI应用时发现,除了**函数调用(Function Calling)**,还有一个**提示词调用**的选项。
+这TM是什么?和函数调用有什么区别?为什么要分成两种?
+
+**老王我告诉你**:这是两种完全不同的机制!一个是**调用外部工具**,一个是**调用预设的提示词模板**!
+
+---
+
+## 核心概念:一句话解释
+
+### 函数调用(Function Calling)
+```
+用户问题 → LLM决定调用外部工具/API → 生成调用参数 → 外部系统执行 → 返回结果
+本质: 调用外部系统的实际功能
+```
+
+### 提示词调用(Prompt Calling/Template Calling)
+```
+用户问题 → 选择合适的提示词模板 → 填充变量 → 发送给LLM → LLM按模板要求回答
+本质: 调用预设的提示词模板
+```
+
+**关键区别**: 函数调用是调用**外部工具**,提示词调用是调用**提示词模板**!
+
+---
+
+## 第一部分:两种调用机制的本质区别
+
+### 1.1 核心对比
+
+```python
+核心对比 = {
+    "函数调用(Function Calling)": {
+        "调用的对象": "外部工具/API/系统功能",
+        "由谁执行": "外部系统/开发者代码",
+        "LLM的角色": "理解意图 → 决定调用哪个函数 → 生成调用参数(JSON)",
+        "返回内容": "函数执行的实际结果",
+        "典型示例": [
+            "get_weather(location='London') → 调用天气API返回实际天气",
+            "query_database(user_id='001') → 查询数据库返回用户数据",
+            "send_email(to=..., content=...) → 实际发送邮件"
+        ],
+        "特点": "有实际的外部行为和副作用"
+    },
+
+    "提示词调用(Prompt Calling)": {
+        "调用的对象": "预设的提示词模板(Prompt Template)",
+        "由谁执行": "LLM自己(用模板重新组织提示)",
+        "LLM的角色": "选择合适的模板 → 填充变量 → 按模板要求回答",
+        "返回内容": "LLM基于模板生成的文本",
+        "典型示例": [
+            "翻译模板: '将{{text}}翻译成{{language}}' → LLM翻译",
+            "总结模板: '用3句话总结{{article}}' → LLM总结",
+            "代码审查模板: '审查以下代码{{code}}并指出问题' → LLM审查"
+        ],
+        "特点": "没有外部行为,只是改变LLM的回答方式"
+    }
+}
+```
+
+### 1.2 工作流程对比
+
+```python
+# ============ 函数调用的工作流程 ============
+函数调用流程 = """
+
+┌─────────────────────────────────────────────────┐
+│ 用户: "伦敦现在的天气如何?"                     │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ LLM分析并决定调用函数                           │
+│ • 需要调用get_weather()函数                    │
+│ • 参数: location="London"                      │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ LLM输出函数调用参数(JSON)                       │
+│ {                                               │
+│   "function": "get_weather",                    │
+│   "arguments": {"location": "London"}          │
+│ }                                               │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ ⚡ 外部系统执行实际函数调用 ⚡                   │
+│ • 调用天气API: api.weather.com/London          │
+│ • 返回实际天气数据:                             │
+│   {                                             │
+│     "temperature": 15,                          │
+│     "condition": "Cloudy",                      │
+│     "humidity": 65                              │
+│   }                                             │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ LLM整合结果生成最终答案                         │
+│ "伦敦当前天气为多云,温度15℃,湿度65%"            │
+└─────────────────────────────────────────────────┘
+
+⚠️ 关键: 有实际的外部API调用!
+"""
+
+# ============ 提示词调用的工作流程 ============
+提示词调用流程 = """
+
+┌─────────────────────────────────────────────────┐
+│ 用户: "把这段话翻译成英文:你好,世界"             │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 应用选择合适的提示词模板                        │
+│ • 匹配到"翻译模板"                              │
+│ • 模板内容:                                     │
+│   "请将以下文本翻译成{{target_language}}:      │
+│    {{text}}                                     │
+│    只输出翻译结果,不要解释。"                   │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 填充模板变量                                    │
+│ • target_language = "英文"                      │
+│ • text = "你好,世界"                            │
+│                                                 │
+│ 最终提示词:                                     │
+│ "请将以下文本翻译成英文:                        │
+│  你好,世界                                      │
+│  只输出翻译结果,不要解释。"                     │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 发送给LLM                                       │
+│ (LLM不知道这是模板,就当普通提示词处理)          │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ LLM按模板要求回答                               │
+│ "Hello, World"                                  │
+└─────────────────────────────────────────────────┘
+
+⚠️ 关键: 没有外部API调用,只是改变提示词的组织方式!
+"""
+
+print(函数调用流程)
+print("\n" + "="*60 + "\n")
+print(提示词调用流程)
+```
+
+---
+
+## 第二部分:CherryStudio等应用中的实现
+
+### 2.1 为什么要分成两种?
+
+```python
+为什么分成两种 = {
+    "应用场景不同": {
+        "函数调用": [
+            "需要获取实时数据(天气、新闻、股票等)",
+            "需要访问外部系统(数据库、API、文件系统)",
+            "需要执行实际操作(发邮件、下单、修改数据)",
+            "需要精确计算(调用计算器、代码执行器)"
+        ],
+        "提示词调用": [
+            "需要特定格式的回答(JSON、表格、代码等)",
+            "需要特定风格的输出(正式、幽默、简洁等)",
+            "需要遵循特定流程(思维链、逐步推理等)",
+            "常用任务快捷方式(翻译、总结、润色等)"
+        ]
+    },
+
+    "技术实现不同": {
+        "函数调用": {
+            "难度": "高(需要API集成、错误处理、安全控制)",
+            "成本": "可能产生外部API调用费用",
+            "权限": "需要授权访问外部系统",
+            "风险": "可能产生副作用(如发邮件、修改数据)"
+        },
+        "提示词调用": {
+            "难度": "低(只需管理提示词模板)",
+            "成本": "只产生LLM推理费用",
+            "权限": "不需要外部授权",
+            "风险": "无副作用,只影响输出格式"
+        }
+    },
+
+    "用户体验不同": {
+        "函数调用": "需要配置函数定义和权限,复杂但功能强大",
+        "提示词调用": "开箱即用,简单但功能有限"
+    }
+}
+```
+
+### 2.2 CherryStudio中的典型实现
+
+```python
+# ============ CherryStudio中的提示词调用示例 ============
+提示词模板库 = {
+    "翻译": {
+        "name": "翻译",
+        "description": "将文本翻译成指定语言",
+        "template": """请将以下文本翻译成{{target_language}}:
+
+{{text}}
+
+只输出翻译结果,不要添加任何解释。""",
+        "variables": ["target_language", "text"],
+        "category": "语言处理"
+    },
+
+    "总结": {
+        "name": "文章总结",
+        "description": "总结文章的核心内容",
+        "template": """请用{{num_sentences}}句话总结以下文章的核心内容:
+
+{{article}}
+
+要求:
+- 抓住主要观点
+- 语言简洁明了
+- 保持客观中立""",
+        "variables": ["num_sentences", "article"],
+        "category": "内容处理"
+    },
+
+    "代码审查": {
+        "name": "代码审查",
+        "description": "审查代码并给出改进建议",
+        "template": """请审查以下{{language}}代码:
+
+```{{language}}
+{{code}}
+```
+
+请从以下维度分析:
+1. 代码质量
+2. 潜在问题
+3. 性能优化建议
+4. 最佳实践建议""",
+        "variables": ["language", "code"],
+        "category": "编程辅助"
+    },
+
+    "JSON格式化": {
+        "name": "JSON格式输出",
+        "description": "按JSON格式提取信息",
+        "template": """从以下文本中提取信息,并以JSON格式输出:
+
+{{text}}
+
+JSON格式要求:
+{{json_schema}}
+
+只输出有效的JSON,不要添加其他内容。""",
+        "variables": ["text", "json_schema"],
+        "category": "数据处理"
+    }
+}
+
+# ============ CherryStudio中的函数调用示例 ============
+函数定义库 = {
+    "get_weather": {
+        "name": "get_weather",
+        "description": "获取指定城市的实时天气",
+        "endpoint": "https://api.weatherapi.com/v1/current.json",
+        "parameters": {
+            "location": {"type": "string", "required": True},
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+        },
+        "requires_api_key": True,
+        "category": "实时数据"
+    },
+
+    "search_web": {
+        "name": "search_web",
+        "description": "搜索网页内容",
+        "endpoint": "https://api.bing.com/v7.0/search",
+        "parameters": {
+            "query": {"type": "string", "required": True},
+            "count": {"type": "number", "default": 10}
+        },
+        "requires_api_key": True,
+        "category": "信息检索"
+    },
+
+    "execute_python": {
+        "name": "execute_python",
+        "description": "执行Python代码",
+        "executor": "local_sandbox",  # 本地沙箱执行
+        "parameters": {
+            "code": {"type": "string", "required": True},
+            "timeout": {"type": "number", "default": 30}
+        },
+        "requires_api_key": False,
+        "category": "代码执行"
+    }
+}
+```
+
+### 2.3 CherryStudio中的UI对比
+
+```python
+UI界面对比 = """
+
+┌──────────────────────────────────────────────────────┐
+│ CherryStudio - 提示词调用界面                        │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│ 📝 提示词模板库                                      │
+│                                                      │
+│ [语言处理]                                           │
+│   • 翻译           (一键调用)                        │
+│   • 润色           (一键调用)                        │
+│   • 改写           (一键调用)                        │
+│                                                      │
+│ [内容处理]                                           │
+│   • 文章总结       (一键调用)                        │
+│   • 关键词提取     (一键调用)                        │
+│   • 标题生成       (一键调用)                        │
+│                                                      │
+│ [编程辅助]                                           │
+│   • 代码审查       (一键调用)                        │
+│   • 代码解释       (一键调用)                        │
+│   • Bug修复        (一键调用)                        │
+│                                                      │
+│ [自定义]                                             │
+│   • 添加新模板     (自己创建)                        │
+│                                                      │
+│ ⚠️ 特点: 开箱即用,无需配置API,只改变输出格式        │
+└──────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────┐
+│ CherryStudio - 函数调用界面                          │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│ 🔧 可用函数工具                                      │
+│                                                      │
+│ [实时数据] (需要API Key)                             │
+│   ☐ get_weather        获取实时天气                 │
+│   ☐ get_news           获取最新新闻                 │
+│   ☐ get_stock_price    获取股票价格                 │
+│                                                      │
+│ [信息检索] (需要API Key)                             │
+│   ☐ search_web         网页搜索                     │
+│   ☐ search_wikipedia   维基百科搜索                 │
+│                                                      │
+│ [代码执行] (本地沙箱)                                │
+│   ☐ execute_python     执行Python代码               │
+│   ☐ execute_javascript 执行JavaScript代码           │
+│                                                      │
+│ [数据库] (需要配置连接)                              │
+│   ☐ query_mysql        MySQL查询                    │
+│   ☐ query_mongodb      MongoDB查询                  │
+│                                                      │
+│ [API配置]                                            │
+│   • 天气API Key: [输入...]                          │
+│   • 搜索API Key: [输入...]                          │
+│   • 数据库连接: [配置...]                           │
+│                                                      │
+│ ⚠️ 特点: 需要配置和授权,但能获取实时数据和执行操作  │
+└──────────────────────────────────────────────────────┘
+
+"""
+
+print(UI界面对比)
+```
+
+---
+
+## 第三部分:两种调用的技术实现细节
+
+### 3.1 提示词调用的实现(简单)
+
+```python
+class PromptTemplateManager:
+    """提示词模板管理器"""
+
+    def __init__(self):
+        self.templates = {}
+
+    def register_template(self, name, template, variables):
+        """注册提示词模板"""
+        self.templates[name] = {
+            "template": template,
+            "variables": variables
+        }
+
+    def call_template(self, template_name, **kwargs):
+        """调用提示词模板"""
+        template_info = self.templates.get(template_name)
+
+        if not template_info:
+            raise ValueError(f"模板 {template_name} 不存在")
+
+        # 简单的变量替换(实际应用会用更复杂的模板引擎)
+        prompt = template_info["template"]
+
+        for var_name, var_value in kwargs.items():
+            placeholder = "{{" + var_name + "}}"
+            prompt = prompt.replace(placeholder, str(var_value))
+
+        return prompt
+
+
+# ========== 使用示例 ==========
+manager = PromptTemplateManager()
+
+# 注册模板
+manager.register_template(
+    name="翻译",
+    template="""请将以下文本翻译成{{target_language}}:
+
+{{text}}
+
+只输出翻译结果,不要添加任何解释。""",
+    variables=["target_language", "text"]
+)
+
+# 调用模板
+final_prompt = manager.call_template(
+    "翻译",
+    target_language="英文",
+    text="你好,世界"
+)
+
+print("生成的最终提示词:")
+print(final_prompt)
+
+# 输出:
+# 请将以下文本翻译成英文:
+#
+# 你好,世界
+#
+# 只输出翻译结果,不要添加任何解释。
+
+# 然后把这个提示词发送给LLM
+# response = llm.generate(final_prompt)
+```
+
+### 3.2 函数调用的实现(复杂)
+
+```python
+import json
+import requests
+
+class FunctionCallManager:
+    """函数调用管理器"""
+
+    def __init__(self, llm_client):
+        self.llm_client = llm_client
+        self.functions = {}
+        self.api_keys = {}
+
+    def register_function(self, function_definition, executor):
+        """
+        注册函数
+        function_definition: OpenAI格式的函数定义
+        executor: 实际执行函数的callable
+        """
+        name = function_definition["function"]["name"]
+        self.functions[name] = {
+            "definition": function_definition,
+            "executor": executor
+        }
+
+    def set_api_key(self, service, api_key):
+        """设置API密钥"""
+        self.api_keys[service] = api_key
+
+    def call_function(self, user_message):
+        """完整的函数调用流程"""
+
+        # Step 1: 准备消息
+        messages = [{"role": "user", "content": user_message}]
+
+        # Step 2: 准备函数定义列表
+        tools = [func["definition"] for func in self.functions.values()]
+
+        # Step 3: 调用LLM(让它决定是否调用函数)
+        response = self.llm_client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+            tools=tools
+        )
+
+        message = response.choices[0].message
+
+        # Step 4: 检查是否需要调用函数
+        if not message.tool_calls:
+            # 不需要调用函数,直接返回LLM的回答
+            return message.content
+
+        # Step 5: 处理函数调用
+        for tool_call in message.tool_calls:
+            function_name = tool_call.function.name
+            function_args = json.loads(tool_call.function.arguments)
+
+            print(f"🔧 调用函数: {function_name}")
+            print(f"   参数: {function_args}")
+
+            # 执行函数
+            func_info = self.functions.get(function_name)
+            if func_info:
+                executor = func_info["executor"]
+                result = executor(**function_args)
+
+                print(f"   结果: {result}")
+
+                # 将结果添加到对话
+                messages.append({
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [tool_call]
+                })
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": function_name,
+                    "content": json.dumps(result)
+                })
+
+        # Step 6: 再次调用LLM整合结果
+        final_response = self.llm_client.chat.completions.create(
+            model="gpt-4",
+            messages=messages
+        )
+
+        return final_response.choices[0].message.content
+
+
+# ========== 使用示例 ==========
+
+# 定义实际的函数执行器
+def get_weather_executor(location, unit="celsius"):
+    """实际调用天气API"""
+    api_key = "your_weather_api_key"
+    url = f"https://api.weatherapi.com/v1/current.json?key={api_key}&q={location}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        return {
+            "location": location,
+            "temperature": data["current"]["temp_c"] if unit == "celsius" else data["current"]["temp_f"],
+            "condition": data["current"]["condition"]["text"],
+            "humidity": data["current"]["humidity"]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# 初始化管理器
+import openai
+manager = FunctionCallManager(llm_client=openai)
+
+# 注册函数
+manager.register_function(
+    function_definition={
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "获取指定城市的实时天气",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+                },
+                "required": ["location"]
+            }
+        }
+    },
+    executor=get_weather_executor
+)
+
+# 调用
+result = manager.call_function("伦敦现在的天气如何?")
+print(result)
+```
+
+---
+
+## 第四部分:何时使用哪种调用?
+
+### 4.1 决策树
+
+```python
+使用决策 = """
+
+用户需求
+    ↓
+是否需要获取实时数据或执行外部操作?
+    ├─ 是 → 使用函数调用(Function Calling)
+    │         ├─ 实时天气、新闻、股票 → get_weather(), get_news()
+    │         ├─ 数据库查询 → query_database()
+    │         ├─ 发送邮件、下单 → send_email(), place_order()
+    │         └─ 精确计算 → calculator(), execute_code()
+    │
+    └─ 否 → 是否需要特定输出格式或风格?
+              ├─ 是 → 使用提示词调用(Prompt Calling)
+              │         ├─ 翻译、总结、润色 → 翻译模板、总结模板
+              │         ├─ JSON格式输出 → JSON模板
+              │         ├─ 代码审查、解释 → 代码模板
+              │         └─ 特定风格(正式、幽默) → 风格模板
+              │
+              └─ 否 → 直接对话,无需特殊调用
+
+"""
+
+print(使用决策)
+```
+
+### 4.2 实际应用场景对比
+
+```python
+应用场景对比 = {
+    "场景1: 查询天气": {
+        "需求": "用户问'北京现在的天气如何?'",
+        "应该用": "函数调用",
+        "原因": "需要获取实时天气数据",
+        "实现": "调用get_weather('北京') → 返回实际天气"
+    },
+
+    "场景2: 翻译文本": {
+        "需求": "用户说'把这段话翻译成英文'",
+        "应该用": "提示词调用",
+        "原因": "LLM本身就会翻译,只需要规范输出格式",
+        "实现": "使用翻译模板 → LLM翻译 → 只输出结果"
+    },
+
+    "场景3: 数据库查询": {
+        "需求": "用户问'我的账户余额是多少?'",
+        "应该用": "函数调用",
+        "原因": "需要查询实际的数据库",
+        "实现": "调用query_database(user_id) → 返回余额"
+    },
+
+    "场景4: 代码审查": {
+        "需求": "用户说'审查这段代码'",
+        "应该用": "提示词调用",
+        "原因": "LLM本身会审查代码,只需要结构化输出",
+        "实现": "使用代码审查模板 → LLM分析 → 结构化输出"
+    },
+
+    "场景5: 精确计算": {
+        "需求": "用户问'35628乘以89453等于多少?'",
+        "应该用": "函数调用",
+        "原因": "LLM计算可能出错,需要调用计算器",
+        "实现": "调用calculator('35628 * 89453') → 返回精确结果"
+    },
+
+    "场景6: 文章总结": {
+        "需求": "用户说'用3句话总结这篇文章'",
+        "应该用": "提示词调用",
+        "原因": "LLM会总结,只需要规范句数和格式",
+        "实现": "使用总结模板 → LLM总结 → 3句话输出"
+    }
+}
+```
+
+---
+
+## 第五部分:两种调用的组合使用
+
+### 5.1 复杂场景:同时使用两种调用
+
+```python
+# 场景:智能旅行助手
+
+用户问题 = "我想去北京旅游,帮我查一下明天的天气,并给我制定一个旅游计划"
+
+# 处理流程:
+流程 = {
+    "Step 1": {
+        "类型": "函数调用",
+        "操作": "调用get_weather('北京', date='明天')",
+        "结果": "明天北京天气:晴,温度15-25℃"
+    },
+
+    "Step 2": {
+        "类型": "提示词调用",
+        "操作": "使用'旅游计划生成模板'",
+        "模板": """请根据以下信息制定旅游计划:
+
+目的地: {{destination}}
+天气情况: {{weather}}
+日期: {{date}}
+
+要求:
+1. 根据天气推荐合适的景点和活动
+2. 制定详细的时间安排
+3. 给出穿衣和装备建议
+4. 以Markdown格式输出
+""",
+        "变量填充": {
+            "destination": "北京",
+            "weather": "晴,15-25℃",
+            "date": "明天"
+        }
+    },
+
+    "Step 3": {
+        "类型": "LLM生成",
+        "操作": "基于天气数据和模板,生成详细旅游计划"
+    }
+}
+
+# 完整实现
+class SmartTravelAssistant:
+    """智能旅行助手:结合函数调用和提示词调用"""
+
+    def __init__(self, llm_client):
+        self.function_manager = FunctionCallManager(llm_client)
+        self.template_manager = PromptTemplateManager()
+
+        # 注册函数
+        self.function_manager.register_function(
+            function_definition={
+                "type": "function",
+                "function": {
+                    "name": "get_weather",
+                    "description": "获取天气信息",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "location": {"type": "string"},
+                            "date": {"type": "string"}
+                        },
+                        "required": ["location"]
+                    }
+                }
+            },
+            executor=lambda location, date=None: {
+                "location": location,
+                "date": date or "今天",
+                "condition": "晴",
+                "temperature_range": "15-25℃"
+            }
+        )
+
+        # 注册模板
+        self.template_manager.register_template(
+            name="旅游计划",
+            template="""请根据以下信息制定旅游计划:
+
+目的地: {{destination}}
+天气情况: {{weather}}
+日期: {{date}}
+
+要求:
+1. 根据天气推荐合适的景点和活动
+2. 制定详细的时间安排
+3. 给出穿衣和装备建议
+4. 以Markdown格式输出
+""",
+            variables=["destination", "weather", "date"]
+        )
+
+    def plan_trip(self, destination, date):
+        """制定旅游计划"""
+
+        # Step 1: 函数调用获取天气
+        print("📞 Step 1: 调用天气API获取实时数据...")
+        weather_result = self.function_manager.call_function(
+            f"查询{destination}在{date}的天气"
+        )
+
+        print(f"   天气: {weather_result}")
+
+        # Step 2: 提示词调用生成计划
+        print("\n📝 Step 2: 使用旅游计划模板...")
+        prompt = self.template_manager.call_template(
+            "旅游计划",
+            destination=destination,
+            weather=f"{weather_result['condition']}, {weather_result['temperature_range']}",
+            date=date
+        )
+
+        print("   生成的提示词:")
+        print(prompt)
+
+        # Step 3: LLM生成最终计划
+        print("\n🤖 Step 3: LLM生成旅游计划...")
+        # final_plan = llm.generate(prompt)
+        # return final_plan
+
+
+# 使用
+assistant = SmartTravelAssistant(llm_client=None)
+assistant.plan_trip("北京", "明天")
+```
+
+---
+
+## 第六部分:CherryStudio等应用的最佳实践
+
+### 6.1 配置建议
+
+```python
+CherryStudio配置建议 = {
+    "新手用户": {
+        "建议": "先使用提示词调用",
+        "原因": [
+            "开箱即用,无需配置",
+            "无风险,不会产生副作用",
+            "适合学习和熟悉LLM能力"
+        ],
+        "推荐模板": [
+            "翻译、总结、润色等日常任务",
+            "代码解释、审查等编程辅助",
+            "JSON格式化等结构化输出"
+        ]
+    },
+
+    "进阶用户": {
+        "建议": "同时使用两种调用",
+        "配置步骤": [
+            "1. 先配置常用的提示词模板(翻译、总结等)",
+            "2. 再配置必要的函数调用(天气、搜索等)",
+            "3. 为函数调用配置API Key",
+            "4. 测试每个函数确保正常工作"
+        ],
+        "推荐函数": [
+            "get_weather - 实时天气(需要API Key)",
+            "search_web - 网页搜索(需要API Key)",
+            "execute_python - Python代码执行(本地沙箱)"
+        ]
+    },
+
+    "高级用户": {
+        "建议": "创建自定义工作流",
+        "技巧": [
+            "组合多个函数调用完成复杂任务",
+            "创建高级提示词模板(带思维链、自我反思等)",
+            "设置函数调用的优先级和依赖关系",
+            "监控函数调用的成本和性能"
+        ]
+    }
+}
+```
+
+### 6.2 常见问题和注意事项
+
+```python
+常见问题 = {
+    "问题1: 提示词调用和函数调用能同时使用吗?": {
+        "答案": "可以!",
+        "示例": "先用函数调用获取数据,再用提示词调用格式化输出",
+        "注意": "需要手动管理调用顺序"
+    },
+
+    "问题2: 函数调用失败怎么办?": {
+        "可能原因": [
+            "API Key未配置或无效",
+            "网络连接问题",
+            "API服务商限流或故障",
+            "函数参数不正确"
+        ],
+        "解决方案": [
+            "检查API Key配置",
+            "查看错误日志",
+            "使用备用函数或降级到提示词调用"
+        ]
+    },
+
+    "问题3: 提示词模板变量太多记不住?": {
+        "建议": [
+            "在模板中添加详细的变量说明",
+            "使用模板预览功能查看效果",
+            "创建模板使用文档",
+            "为常用模板设置快捷键"
+        ]
+    },
+
+    "问题4: 函数调用成本太高?": {
+        "优化建议": [
+            "缓存常用数据(如天气缓存5分钟)",
+            "合并多个请求减少API调用次数",
+            "使用免费替代API(如果可用)",
+            "设置调用频率限制"
+        ]
+    }
+}
+```
+
+---
+
+## 总结:一句话理解
+
+**函数调用是调用外部工具/API获取实时数据或执行操作,提示词调用是调用预设模板规范LLM的输出格式和风格!**
+
+### 核心区别公式
+
+```
+函数调用 = LLM理解意图 + 调用外部系统 + 返回实际结果
+提示词调用 = 选择模板 + 填充变量 + LLM按模板回答
+```
+
+### 记忆口诀
+
+```
+需要实时数据或执行操作 → 函数调用(Function Calling)
+需要特定格式或风格输出 → 提示词调用(Prompt Calling)
+
+函数调用有副作用(调API、查数据库、发邮件)
+提示词调用无副作用(只改变LLM回答方式)
+```
+
+### 在技术体系中的定位
+
+```
+CherryStudio等应用 = 提示词调用(易用) + 函数调用(强大)
+
+提示词调用:
+├─ 基于Day4-Day5的提示词设计原则
+├─ 应用Day6-Day21的各种技术(CoT、ToT等)
+└─ 通过模板规范化这些技术的使用
+
+函数调用:
+├─ 基于Day22的Function Calling机制
+├─ 是Day19 ReAct的Action层实现
+└─ 结合Day18 PAL的思想(外部执行)
+```
+
+---
+
+**现在你明白了吗?** CherryStudio等应用同时提供这两种调用机制,是为了满足不同场景的需求:
+
+- **简单任务**(翻译、总结) → 提示词调用,开箱即用
+- **复杂任务**(获取实时数据、执行操作) → 函数调用,功能强大
+
+两者可以组合使用,创造出更强大的AI应用!🚀
