@@ -20,8 +20,8 @@
 
 ```
 核心区别：
-ReAct = 线性数据结构 + 顺序推理
-Graph Prompting = 图数据结构 + 网络推理
+ReAct = 线性主流程 + 可选的临时树状/多路径推理
+Graph Prompting = 全局持久化的图结构 + 网络推理
 
 这不是"优化"关系，而是"范式"差异！
 ```
@@ -29,6 +29,48 @@ Graph Prompting = 图数据结构 + 网络推理
 **关键理解**：
 - ❌ **不是**：ReAct加上图算法就是Graph Prompting
 - ✅ **而是**：两种完全不同的问题建模和推理方式
+
+---
+
+## 重要澄清 ⚠️
+
+**ReAct不是纯线性的！**
+
+让老王我先澄清一个重要的点：
+
+```pytho
+# ReAct的实际结构（更准确的描述）
+
+ReAct的分层结构：
+┌─────────────────────────────────────────────────┐
+│ 主执行流程（线性）                              │
+│   Step1 → Step2 → Step3 → Step4 → ...         │
+├─────────────────────────────────────────────────┤
+│ 但在每个Step的"推理子过程"中可以有：            │
+│                                                 │
+│ ┌────────────────────────────────┐              │
+│ │ 推理层（可以是树状/多路径）    │              │
+│ │                                │              │
+│ │ • ToT树状探索                  │              │
+│ │ • Self-Consistency多路径       │              │
+│ │ • 评分选出最优thought          │              │
+│ │                                │              │
+│ │ 最终只返回一个thought给主流程  │              │
+│ └────────────────────────────────┘              │
+│             ↓                                   │
+│  主流程继续（线性）：Action → Observation       │
+└─────────────────────────────────────────────────┘
+```
+
+**关键点**：
+1. **主执行流程是线性的**：Step1→Step2→Step3
+2. **推理子过程可以是树状/多路径**：临时使用ToT或Self-Consistency
+3. **最终还是要选一个thought**：继续线性执行
+4. **树状/多路径结构是临时的**：不持久化保存
+
+**vs Graph Prompting**：
+- Graph Prompting：**整个推理过程就是图**，所有路径持久化保存
+- ReAct：**主流程是线性**，只是推理时临时构建树状/多路径
 
 ---
 
@@ -44,54 +86,169 @@ class ReActDataStructure:
 
     数据结构：数组/列表
     复杂度：O(N)
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    五层架构中的技术融合 (详见Day19_2)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    虽然主执行流程是线性的，但每一层都融合了多种前置技术：
+
+    📍 第一层 - 问题理解层：
+       • Zero-Shot (Day6) - 无示例直接理解
+       • Few-Shot (Day7) - 示例引导理解
+       • Generate Knowledge (Day10) - 生成背景知识
+       • Prompt Chaining (Day11) - 分步骤理解
+
+    📍 第二层 - 推理计划层（可能包含树状/多路径）：
+       • CoT (Day8) - 显式推理链
+       • Self-Consistency (Day9) - 多路径验证
+       • ToT (Day12) - 树状探索（临时构建，不持久化！）
+       • Directional Stimulus (Day17) - 定向刺激
+
+    📍 第三层 - 工具执行层：
+       • PAL思想 (Day18) - LLM生成指令 → 外部执行
+
+    📍 第四层 - 结果观察层：
+       • Prompt Chaining (Day11) - 链式分析
+       • Generate Knowledge (Day10) - 知识整合
+       • Zero-Shot (Day6) - 信息提取
+
+    📍 第五层 - 答案生成层：
+       • CoT (Day8) - 推理链综合
+       • Self-Consistency (Day9) - 多版本验证
+       • Directional Stimulus (Day17) - 质量控制
+
+    ⚠️ 关键：尽管第二层可能临时使用ToT树状结构或Self-Consistency
+             多路径推理，但这些树/多路径是临时的、子过程级的，
+             最终还是选出一个thought继续线性主流程！
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     """
 
     def __init__(self):
-        # 线性结构
+        # 线性结构 - 主执行流程的历史记录
         self.history = []  # [思考1, 行动1, 观察1, 思考2, 行动2, 观察2, ...]
 
     def add_step(self, thought, action, observation):
-        """添加推理步骤（线性追加）"""
+        """
+        添加推理步骤（线性追加）
+
+        注意：
+        - thought可能来自第二层的树状/多路径推理，但只存储最终选中的一个
+        - action由第三层PAL模式生成
+        - observation由第四层链式处理
+        """
         self.history.append({
             "type": "thought",
-            "content": thought
+            "content": thought,
+            # 元信息：可能包含推理层使用的技术（如"使用了ToT选择"）
+            "meta": "第二层融合技术生成"
         })
         self.history.append({
             "type": "action",
-            "content": action
+            "content": action,
+            "meta": "第三层PAL模式执行"
         })
         self.history.append({
             "type": "observation",
-            "content": observation
+            "content": observation,
+            "meta": "第四层链式分析提取"
         })
 
     def get_context(self):
-        """获取上下文（顺序读取）"""
+        """
+        获取上下文（顺序读取）
+
+        特点：虽然第二层推理时可能临时构建了树状结构，
+             但这里只保存了线性主流程的历史
+        """
         return self.history
 
     def visualize(self):
-        """可视化：线性链条"""
-        print("ReAct数据结构（线性）：")
-        print("Thought1 → Action1 → Obs1 → Thought2 → Action2 → Obs2 → ...")
-        print("     ↓         ↓        ↓        ↓         ↓        ↓")
-        print("   [步骤0]  [步骤1]  [步骤2]  [步骤3]  [步骤4]  [步骤5]")
+        """
+        可视化：线性链条
 
-# 示例使用
+        可视化展示的是主执行流程（线性），
+        但每个Thought背后可能经过了复杂的树状/多路径推理
+        """
+        print("ReAct数据结构（线性主流程）：")
+        print("Thought1 → Action1 → Obs1 → Thought2 → Action2 → Obs2 → ...")
+        print("   ↓         ↓        ↓        ↓         ↓        ↓")
+        print(" [步骤0]  [步骤1]  [步骤2]  [步骤3]  [步骤4]  [步骤5]")
+        print()
+        print("💡 注意：每个Thought可能经过了：")
+        print("   • CoT显式推理")
+        print("   • Self-Consistency多路径验证")
+        print("   • ToT树状探索（临时构建，最终选一个）")
+        print("   但这些过程不持久化，只保存最终选中的thought")
+
+# 示例使用 - 展示五层架构技术融合
 react = ReActDataStructure()
+
+# Step 1: 添加第一个推理步骤
+# （背后经过了第一层的Zero-Shot/Few-Shot理解，
+#   第二层的CoT+ToT树状探索选出最优thought，
+#   第三层的PAL模式生成action，
+#   第四层的链式分析提取observation）
 react.add_step(
-    thought="需要查询法国首都",
-    action="search('法国首都')",
-    observation="法国首都是巴黎"
+    thought="需要查询法国首都（第二层融合CoT+ToT选出）",
+    action="search('法国首都')（第三层PAL模式生成）",
+    observation="法国首都是巴黎（第四层链式提取）"
 )
+
 react.visualize()
 
 # 输出：
 """
-ReAct数据结构（线性）：
+ReAct数据结构（线性主流程）：
 Thought1 → Action1 → Obs1 → Thought2 → Action2 → Obs2 → ...
-     ↓         ↓        ↓        ↓         ↓        ↓
-   [步骤0]  [步骤1]  [步骤2]  [步骤3]  [步骤4]  [步骤5]
+   ↓         ↓        ↓        ↓         ↓        ↓
+ [步骤0]  [步骤1]  [步骤2]  [步骤3]  [步骤4]  [步骤5]
+
+💡 注意：每个Thought可能经过了：
+   • CoT显式推理
+   • Self-Consistency多路径验证
+   • ToT树状探索（临时构建，最终选一个）
+   但这些过程不持久化，只保存最终选中的thought
 """
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 技术融合示意图（虽然看起来是线性，但每层都融合了多种技术）
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+print("""
+ReAct五层架构技术融合示意：
+
+┌──────────────────────────────────────────────┐
+│ Step 1: Thought1                             │
+│ ├─ 第1层：Zero-Shot/Few-Shot问题理解        │
+│ ├─ 第2层：CoT+ToT树状探索（临时！）         │  ← 可能有树状/多路径
+│ │         ├─ 分支A: 搜索"法国首都"           │     但只选一个
+│ │         ├─ 分支B: 搜索"巴黎"               │
+│ │         └─ 选择分支A（最优）               │
+│ └─ 输出：Thought1="需要查询法国首都"        │
+├──────────────────────────────────────────────┤
+│ Step 2: Action1                              │
+│ └─ 第3层：PAL模式生成工具调用               │
+│           "search('法国首都')"                │
+├──────────────────────────────────────────────┤
+│ Step 3: Observation1                         │
+│ └─ 第4层：链式分析提取关键信息              │
+│           "法国首都是巴黎"                    │
+└──────────────────────────────────────────────┘
+                    ↓
+            （线性进入下一轮）
+                    ↓
+┌──────────────────────────────────────────────┐
+│ Step 4: Thought2 ...                         │
+└──────────────────────────────────────────────┘
+
+⚠️ 关键理解：
+- 主流程是线性的（Step1 → Step2 → Step3 → ...）
+- 但第2层推理时可能临时构建树状/多路径结构
+- 这些树/多路径结构不持久化在self.history中
+- self.history只保存线性主流程的最终选择
+""")
 ```
 
 ### 1.2 Graph Prompting的图数据结构
@@ -106,41 +263,157 @@ class GraphPromptingDataStructure:
 
     数据结构：图（节点 + 边）
     复杂度：O(V + E)
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    Graph Prompting的技术融合架构 (整合Day6-Day18技术)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    Graph Prompting的核心是将所有推理路径持久化为图结构,
+    在图的构建、遍历、推理的各个阶段融合前置技术:
+
+    📍 第一阶段 - 图构建层 (Graph Construction):
+       目标: 从问题构建知识图谱
+       融合技术:
+       • Zero-Shot (Day6) - 无示例识别实体和关系
+       • Few-Shot (Day7) - 示例引导实体抽取
+       • Generate Knowledge (Day10) - 生成节点的背景知识
+       • Prompt Chaining (Day11) - 分步骤构建图结构
+
+    📍 第二阶段 - 多路径生成层 (Multi-Path Generation):
+       目标: 从起点到终点生成所有可能的推理路径
+       融合技术:
+       • ToT (Day12) - 树状搜索所有可能路径(持久化!)
+       • Self-Consistency (Day9) - 多路径并行探索
+       • CoT (Day8) - 每条路径都有显式推理链
+       • Directional Stimulus (Day17) - 引导路径生成方向
+
+    📍 第三阶段 - 路径评分层 (Path Scoring):
+       目标: 评估每条路径的质量和可信度
+       融合技术:
+       • Self-Consistency (Day9) - 多路径投票机制
+       • CoT (Day8) - 基于推理链质量评分
+       • Generate Knowledge (Day10) - 补充路径的知识支撑
+       • Directional Stimulus (Day17) - 定向优化路径质量
+
+    📍 第四阶段 - 最优路径选择层 (Optimal Path Selection):
+       目标: 从多条路径中选出最佳推理路径
+       融合技术:
+       • Self-Consistency (Day9) - 一致性验证
+       • ToT (Day12) - 树状剪枝策略
+       • APE (Day16) - 自动优化路径选择标准
+       • CoT (Day8) - 综合推理链质量
+
+    📍 第五阶段 - 图推理与答案生成层 (Graph Reasoning):
+       目标: 基于图和最优路径生成答案
+       融合技术:
+       • CoT (Day8) - 沿最优路径进行链式推理
+       • Prompt Chaining (Day11) - 链式整合路径信息
+       • Generate Knowledge (Day10) - 补充推理所需知识
+       • Directional Stimulus (Day17) - 引导答案生成方向
+
+    ⚠️ 关键: Graph Prompting vs ReAct的技术融合区别
+
+        ReAct:
+        - 主流程线性,第二层临时使用ToT/Self-Consistency
+        - 树状/多路径是临时的,不持久化
+        - history只保存线性主流程的最终选择
+
+        Graph Prompting:
+        - 整个推理过程就是图,所有路径持久化
+        - ToT/Self-Consistency贯穿整个流程
+        - graph.nodes和graph.edges保存所有路径和节点
+        - 多路径并行存在,最后评分选最优
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     """
 
     def __init__(self):
-        # 图结构
+        # 图结构(持久化存储所有推理路径!)
         self.graph = nx.DiGraph()  # 有向图
         self.node_id = 0
 
     def add_entity(self, entity_name, entity_type):
-        """添加实体节点"""
+        """
+        添加实体节点
+
+        技术融合(第一阶段 - 图构建层):
+        - Zero-Shot/Few-Shot (Day6/7) - 识别实体
+        - Generate Knowledge (Day10) - 为节点生成背景知识
+        """
         node_id = f"node_{self.node_id}"
         self.graph.add_node(
             node_id,
             name=entity_name,
-            type=entity_type
+            type=entity_type,
+            # 元信息: 记录使用的技术
+            meta={
+                "extraction_method": "Zero-Shot/Few-Shot识别实体",
+                "knowledge_enhanced": True  # Generate Knowledge补充知识
+            }
         )
         self.node_id += 1
         return node_id
 
     def add_relation(self, source_id, target_id, relation_type):
-        """添加关系边"""
+        """
+        添加关系边(推理路径的一部分)
+
+        技术融合(第一阶段 - 图构建层):
+        - CoT (Day8) - 每条边代表一步推理
+        - Prompt Chaining (Day11) - 边连接形成推理链
+        """
         self.graph.add_edge(
             source_id,
             target_id,
-            type=relation_type
+            type=relation_type,
+            # 元信息: 记录推理链
+            meta={
+                "reasoning_step": f"{source_id} --{relation_type}--> {target_id}",
+                "cot_enabled": True  # CoT推理链
+            }
         )
 
     def get_neighbors(self, node_id):
-        """获取邻居节点（图遍历）"""
+        """
+        获取邻居节点(图遍历)
+
+        技术融合(第二阶段 - 多路径生成层):
+        - ToT (Day12) - 树状遍历所有可能节点
+        - Self-Consistency (Day9) - 并行探索多个分支
+        """
         return list(self.graph.successors(node_id))
 
     def find_paths(self, start_id, end_id):
-        """查找所有路径（图算法）"""
+        """
+        查找所有路径(多路径生成!)
+
+        技术融合(第二阶段 - 多路径生成层):
+        - ToT (Day12) - 树状搜索所有路径(持久化!)
+        - Self-Consistency (Day9) - 多路径并行生成
+        - CoT (Day8) - 每条路径都是一条推理链
+        - Directional Stimulus (Day17) - 引导路径方向
+
+        ⚠️ 关键: 所有路径都被持久化保存在图中!
+                这和ReAct临时构建树/多路径完全不同!
+        """
         try:
+            # 生成所有可能的推理路径(ToT树状搜索)
             paths = list(nx.all_simple_paths(self.graph, start_id, end_id))
-            return paths
+
+            # 为每条路径附加推理链信息(CoT)
+            paths_with_reasoning = []
+            for path in paths:
+                reasoning_chain = " → ".join([
+                    self.graph.nodes[node]['name'] for node in path
+                ])
+                paths_with_reasoning.append({
+                    "path": path,
+                    "reasoning_chain": reasoning_chain,  # CoT推理链
+                    "cot_enabled": True,
+                    "tot_persistent": True  # ToT持久化!
+                })
+
+            return paths_with_reasoning
         except:
             return []
 
@@ -155,24 +428,71 @@ class GraphPromptingDataStructure:
         print("      ↘   ↓   ↙")
         print("       埃菲尔铁塔")
 
-# 示例使用
+# 示例使用 - 展示Graph Prompting五阶段技术融合
 graph_prompt = GraphPromptingDataStructure()
 
-# 添加实体
-france = graph_prompt.add_entity("法国", "国家")
-paris = graph_prompt.add_entity("巴黎", "城市")
-eiffel = graph_prompt.add_entity("埃菲尔铁塔", "地标")
-europe = graph_prompt.add_entity("欧洲", "大陆")
+# ========== 第一阶段: 图构建层 - 整合Day6/7/10/11技术 ==========
+print("【第一阶段: 图构建层】")
+print("融合技术: Zero-Shot + Few-Shot + Generate Knowledge + Prompt Chaining")
 
-# 添加关系
-graph_prompt.add_relation(france, paris, "首都是")
-graph_prompt.add_relation(paris, eiffel, "有地标")
-graph_prompt.add_relation(france, europe, "位于")
+# 添加实体(使用Zero-Shot/Few-Shot识别, Generate Knowledge补充)
+france = graph_prompt.add_entity("法国", "国家")      # Zero-Shot识别实体类型
+paris = graph_prompt.add_entity("巴黎", "城市")       # Few-Shot引导抽取
+eiffel = graph_prompt.add_entity("埃菲尔铁塔", "地标") # Generate Knowledge补充知识
+europe = graph_prompt.add_entity("欧洲", "大陆")      # Prompt Chaining分步构建
+
+print(f"✓ 构建了{len(graph_prompt.graph.nodes())}个节点(实体)")
+
+# 添加关系(使用CoT推理 + Prompt Chaining链式连接)
+graph_prompt.add_relation(france, paris, "首都是")   # CoT推理边的关系
+graph_prompt.add_relation(paris, eiffel, "有地标")   # Prompt Chaining链式构建
+graph_prompt.add_relation(france, europe, "位于")    # 形成完整推理链
+
+print(f"✓ 构建了{len(graph_prompt.graph.edges())}条边(关系)")
+print("✓ 图构建完成,所有路径持久化!")
+
+# ========== 第二阶段: 多路径生成层 - 整合ToT/Self-Consistency/CoT/Directional Stimulus ==========
+print("\n【第二阶段: 多路径生成层】")
+print("融合技术: ToT(持久化!) + Self-Consistency + CoT + Directional Stimulus")
+
+# 查找所有可能的推理路径(ToT树状搜索 + Self-Consistency并行探索)
+all_paths = graph_prompt.find_paths(france, eiffel)
+
+print(f"✓ ToT树状搜索找到{len(all_paths)}条可能路径")
+print(f"✓ Self-Consistency并行探索所有路径")
+print(f"✓ 每条路径都有CoT推理链")
+
+for i, path_info in enumerate(all_paths, 1):
+    print(f"  路径{i}: {path_info['reasoning_chain']}")  # CoT推理链
+    print(f"         持久化标记: {path_info['tot_persistent']}")
+
+# ⚠️ 关键: 所有路径都被持久化保存在图中!
+print("\n⚠️ 关键区别:")
+print("  ReAct: 第二层临时构建树状结构,最终只选一个thought,树被丢弃")
+print("  Graph: 所有路径都持久化保存在graph.nodes和graph.edges中!")
 
 graph_prompt.visualize()
 
 # 输出：
 """
+【第一阶段: 图构建层】
+融合技术: Zero-Shot + Few-Shot + Generate Knowledge + Prompt Chaining
+✓ 构建了4个节点(实体)
+✓ 构建了3条边(关系)
+✓ 图构建完成,所有路径持久化!
+
+【第二阶段: 多路径生成层】
+融合技术: ToT(持久化!) + Self-Consistency + CoT + Directional Stimulus
+✓ ToT树状搜索找到1条可能路径
+✓ Self-Consistency并行探索所有路径
+✓ 每条路径都有CoT推理链
+  路径1: 法国 → 巴黎 → 埃菲尔铁塔
+         持久化标记: True
+
+⚠️ 关键区别:
+  ReAct: 第二层临时构建树状结构,最终只选一个thought,树被丢弃
+  Graph: 所有路径都持久化保存在graph.nodes和graph.edges中!
+
 Graph Prompting数据结构（图）：
          法国
         ↙  ↓  ↘
@@ -182,6 +502,92 @@ Graph Prompting数据结构（图）：
       ↘   ↓   ↙
        埃菲尔铁塔
 """
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Graph Prompting五阶段技术融合示意图
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+print("""
+Graph Prompting五阶段技术融合示意图:
+
+┌──────────────────────────────────────────────────────────┐
+│ 第一阶段: 图构建层 (Graph Construction)                  │
+│ ├─ Zero-Shot (Day6) - 无示例识别实体                    │
+│ ├─ Few-Shot (Day7) - 示例引导实体抽取                   │
+│ ├─ Generate Knowledge (Day10) - 生成节点背景知识        │
+│ └─ Prompt Chaining (Day11) - 分步骤构建图结构           │
+│                                                          │
+│ 输出: graph.nodes = {法国, 巴黎, 埃菲尔铁塔, 欧洲}      │
+│      graph.edges = {(法国,巴黎), (巴黎,埃菲尔铁塔), ...} │
+│      ⚠️ 所有节点和边都持久化保存!                        │
+└──────────────────────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────────────────────┐
+│ 第二阶段: 多路径生成层 (Multi-Path Generation)          │
+│ ├─ ToT (Day12) - 树状搜索所有可能路径 (持久化!)         │  ← 关键!
+│ ├─ Self-Consistency (Day9) - 多路径并行探索             │     所有路径
+│ ├─ CoT (Day8) - 每条路径都有显式推理链                  │     都保存!
+│ └─ Directional Stimulus (Day17) - 引导路径生成方向      │
+│                                                          │
+│ 输出: all_paths = [                                     │
+│   {'path': [法国, 巴黎, 埃菲尔铁塔],                     │
+│    'reasoning_chain': '法国 → 巴黎 → 埃菲尔铁塔',        │
+│    'tot_persistent': True},  # ← ToT持久化标记!          │
+│   ... # 可能有多条路径并存                               │
+│ ]                                                        │
+└──────────────────────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────────────────────┐
+│ 第三阶段: 路径评分层 (Path Scoring)                      │
+│ ├─ Self-Consistency (Day9) - 多路径投票机制             │
+│ ├─ CoT (Day8) - 基于推理链质量评分                      │
+│ ├─ Generate Knowledge (Day10) - 补充路径知识支撑        │
+│ └─ Directional Stimulus (Day17) - 定向优化路径质量      │
+│                                                          │
+│ 输出: scored_paths = [                                  │
+│   {'path': [...], 'score': 0.95},  # 最优路径            │
+│   {'path': [...], 'score': 0.87},  # 次优路径            │
+│   ...                                                    │
+│ ]                                                        │
+└──────────────────────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────────────────────┐
+│ 第四阶段: 最优路径选择层 (Optimal Path Selection)       │
+│ ├─ Self-Consistency (Day9) - 一致性验证                 │
+│ ├─ ToT (Day12) - 树状剪枝策略                           │
+│ ├─ APE (Day16) - 自动优化路径选择标准                   │
+│ └─ CoT (Day8) - 综合推理链质量                          │
+│                                                          │
+│ 输出: best_path = scored_paths[0]  # 选出最优路径       │
+└──────────────────────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────────────────────┐
+│ 第五阶段: 图推理与答案生成层 (Graph Reasoning)          │
+│ ├─ CoT (Day8) - 沿最优路径进行链式推理                  │
+│ ├─ Prompt Chaining (Day11) - 链式整合路径信息           │
+│ ├─ Generate Knowledge (Day10) - 补充推理所需知识        │
+│ └─ Directional Stimulus (Day17) - 引导答案生成方向      │
+│                                                          │
+│ 输出: final_answer = "基于图推理的最终答案"             │
+└──────────────────────────────────────────────────────────┘
+
+⚠️ Graph Prompting vs ReAct 技术融合的核心区别:
+
+ReAct (临时树/多路径):
+  第二层 → ToT树状探索 → 选出一个thought → 树被丢弃
+  history = [
+    {thought: "选中的thought", ...},  # 只保存最终选择
+    ...
+  ]
+
+Graph Prompting (持久化图/所有路径):
+  第二阶段 → ToT树状搜索 → 所有路径持久化 → 评分选最优
+  graph.nodes = {所有实体节点}       # 全部保存!
+  graph.edges = {所有推理路径的边}   # 全部保存!
+  all_paths = [路径1, 路径2, ...]   # 全部保存!
+
+这TM才是本质区别!
+""")
 ```
 
 ### 1.3 数据结构对比
