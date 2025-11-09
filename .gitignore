@@ -57,5 +57,114 @@ Thumbs.db
 *.log
 logs/
 
+# learning_project
 
+# ============================================
+# Sub-projects (complete exclusion)
+# ============================================
+# These are external projects/references, exclude from main project tracking
+cherry-studio/
+kimi-cli-main/
+DeepSeek-V3-main/
+AutoDocxProofread-base_ui/
+DeepSeek-OCR-ForLearning/
+DeepSearchAgent-Demo-main/
+learn-nlp-with-transformers-main/
+BettaFish-main/
+Prompt-Engineering-Guide-main/
 
+# ============================================
+# Sub-projects gitignore rules (if not excluded above)
+# ============================================
+
+# --- cherry-studio ---
+# Node.js / Yarn
+cherry-studio/node_modules/
+cherry-studio/dist/
+cherry-studio/out/
+cherry-studio/.yarn-cache
+cherry-studio/.pnp.*
+cherry-studio/.yarn/*
+!cherry-studio/.yarn/patches
+!cherry-studio/.yarn/plugins
+!cherry-studio/.yarn/releases
+!cherry-studio/.yarn/sdks
+!cherry-studio/.yarn/versions
+cherry-studio/stats.html
+cherry-studio/.eslintcache
+
+# Logs (cherry-studio specific)
+cherry-studio/logs/
+cherry-studio/*.log*
+cherry-studio/npm-debug.log*
+cherry-studio/yarn-debug.log*
+cherry-studio/yarn-error.log*
+cherry-studio/pnpm-debug.log*
+cherry-studio/lerna-debug.log*
+
+# Environment files
+cherry-studio/.env
+cherry-studio/.env.*
+!cherry-studio/.env.example
+
+# Editor directories
+cherry-studio/.vscode/*
+!cherry-studio/.vscode/extensions.json
+
+# Local development files
+cherry-studio/local/
+cherry-studio/.aider*
+cherry-studio/.cursorrules
+cherry-studio/.cursor/*
+cherry-studio/.claude/*
+cherry-studio/.gemini/*
+cherry-studio/.qwen/*
+cherry-studio/.trae/*
+cherry-studio/.claude-code-router/*
+cherry-studio/.codebuddy/*
+cherry-studio/.zed/*
+cherry-studio/CLAUDE.local.md
+
+# MCP server
+cherry-studio/mcp_server/
+
+# Testing & Coverage
+cherry-studio/coverage/
+cherry-studio/.vitest-cache/
+cherry-studio/vitest.config.*.timestamp-*
+cherry-studio/playwright-report/
+cherry-studio/test-results/
+
+# TypeScript
+cherry-studio/.tsbuildinfo
+
+# Misc
+cherry-studio/YOUR_MEMORY_FILE_PATH
+cherry-studio/.sessions/
+
+# --- kimi-cli-main ---
+# Python-generated files
+kimi-cli-main/__pycache__/
+kimi-cli-main/*.py[oc]
+kimi-cli-main/build/
+kimi-cli-main/dist/
+kimi-cli-main/wheels/
+kimi-cli-main/*.egg-info
+
+# Virtual environments
+kimi-cli-main/.venv
+
+# Project files
+kimi-cli-main/.vscode/
+kimi-cli-main/.env
+kimi-cli-main/.env.local
+kimi-cli-main/tests_local/
+kimi-cli-main/uv.toml
+kimi-cli-main/.idea/*
+
+# Build dependencies
+kimi-cli-main/src/kimi_cli/deps/bin/
+kimi-cli-main/src/kimi_cli/deps/tmp/
+
+# Generated reports
+kimi-cli-main/tests_ai/report.json
